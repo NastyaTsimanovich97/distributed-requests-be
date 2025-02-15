@@ -40,7 +40,7 @@ export default [
       parserOptions: {
         project: 'tsconfig.json',
         tsconfigRootDir:
-          '/Users/macbookpro/Documents/interview/distributed-requests/backend',
+          '/Users/macbookpro/Documents/interview/distributed-requests-be',
       },
     },
 
