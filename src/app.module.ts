@@ -1,0 +1,24 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import configuration from './common/config/configuration';
+import { typeOrmAsyncConfig } from './common/config/typeOrmAsyncConfig';
+
+import { RequestsModule } from './requests/requests.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: ['.env', '.env.example'],
+      cache: true,
+      load: [configuration],
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
+    RequestsModule,
+  ],
+  controllers: [],
+  providers: [],
+})
+export class AppModule {}
