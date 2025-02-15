@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import configuration from './common/config/configuration';
-import { typeOrmAsyncConfig } from './common/config/typeOrmAsyncConfig';
+import { typeOrmAsyncConfig } from './common/config/type-orm-async-config';
 
 import { RequestsModule } from './requests/requests.module';
 

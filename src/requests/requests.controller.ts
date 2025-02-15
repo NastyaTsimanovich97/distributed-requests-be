@@ -1,42 +1,56 @@
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+
 import { RequestsService } from './requests.service';
 import { CreateRequestDto } from './dto/create-request.dto';
-import { UpdateRequestDto } from './dto/update-request.dto';
+import { RequestEntity } from './entities/request.entity';
+
+import {
+  DUPLICATE_REQUEST,
+  NOT_FOUND_REQUEST,
+} from '../common/constants/errors';
 
 @Controller('requests')
+@ApiTags('Requests')
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
   @Post()
-  create(@Body() createRequestDto: CreateRequestDto) {
+  @ApiBadRequestResponse({ description: DUPLICATE_REQUEST })
+  @ApiCreatedResponse({
+    description: 'The record has been successfully created.',
+    type: RequestEntity,
+  })
+  async create(
+    @Body() createRequestDto: CreateRequestDto,
+  ): Promise<RequestEntity> {
     return this.requestsService.create(createRequestDto);
   }
 
   @Get()
-  findAll() {
+  @ApiResponse({
+    description: 'All records in the system.',
+    type: RequestEntity,
+    isArray: true,
+  })
+  async findAll(): Promise<RequestEntity[]> {
     return this.requestsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.requestsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto) {
-    return this.requestsService.update(+id, updateRequestDto);
-  }
-
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.requestsService.remove(+id);
+  @ApiNotFoundResponse({ description: NOT_FOUND_REQUEST })
+  @ApiResponse({
+    description: 'The record has been successfully removed.',
+    type: String,
+  })
+  async remove(@Param('id') id: string) {
+    return this.requestsService.remove(id);
   }
 }

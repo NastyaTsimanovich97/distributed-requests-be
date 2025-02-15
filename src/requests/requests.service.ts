@@ -1,28 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import {
+  DUPLICATE_REQUEST,
+  NOT_FOUND_REQUEST,
+} from '../common/constants/errors';
+
+import { isDuplicateError } from '../utils/isDuplicateError.util';
 import { CreateRequestDto } from './dto/create-request.dto';
-import { UpdateRequestDto } from './dto/update-request.dto';
+import { RequestEntity } from './entities/request.entity';
 
 @Injectable()
 export class RequestsService {
-  create(createRequestDto: CreateRequestDto) {
-    console.log(createRequestDto);
-    return 'This action adds a new request';
+  constructor(
+    @InjectRepository(RequestEntity)
+    private requestRepository: Repository<RequestEntity>,
+  ) {}
+
+  async create(createRequestDto: CreateRequestDto): Promise<RequestEntity> {
+    try {
+      return await this.requestRepository.save(createRequestDto);
+    } catch (error) {
+      const isDuplicate = isDuplicateError(error.message);
+
+      if (isDuplicate) {
+        throw new BadRequestException(DUPLICATE_REQUEST);
+      }
+
+      throw Error(error);
+    }
   }
 
-  findAll() {
-    return `This action returns all requests`;
+  async findAll(): Promise<RequestEntity[]> {
+    return this.requestRepository.find({ order: { createdAt: 'ASC' } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} request`;
-  }
+  async remove(id: string): Promise<string> {
+    const { affected } = await this.requestRepository.delete(id);
 
-  update(id: number, updateRequestDto: UpdateRequestDto) {
-    console.log(updateRequestDto);
-    return `This action updates a #${id} request`;
-  }
+    if (!affected) {
+      throw new NotFoundException(NOT_FOUND_REQUEST);
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} request`;
+    return 'Record is deleted';
   }
 }
