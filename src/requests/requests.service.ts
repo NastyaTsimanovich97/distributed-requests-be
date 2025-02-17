@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 
 import {
   DUPLICATE_REQUEST,
@@ -49,9 +49,13 @@ export class RequestsService {
     });
   }
 
-  async update(id: string, data: Partial<RequestEntity>): Promise<void> {
+  async updateTransactional(
+    queryRunner: QueryRunner,
+    id: string,
+    data: Partial<RequestEntity>,
+  ): Promise<void> {
     try {
-      await this.requestRepository.update(id, data);
+      await queryRunner.manager.update(RequestEntity, id, data);
     } catch (error) {
       const isDuplicate = isDuplicateError(error.message);
 
