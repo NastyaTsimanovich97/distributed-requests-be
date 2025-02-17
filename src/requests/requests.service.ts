@@ -15,6 +15,7 @@ import {
 import { isDuplicateError } from '../utils/isDuplicateError.util';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { RequestEntity } from './entities/request.entity';
+import { RequestStatus } from './enums/request-status.enum';
 
 @Injectable()
 export class RequestsService {
@@ -39,6 +40,27 @@ export class RequestsService {
 
   async findAll(): Promise<RequestEntity[]> {
     return this.requestRepository.find({ order: { createdAt: 'ASC' } });
+  }
+
+  async findAllNewRequests(): Promise<RequestEntity[]> {
+    return this.requestRepository.find({
+      where: { status: RequestStatus.NEW },
+      order: { createdAt: 'ASC' },
+    });
+  }
+
+  async update(id: string, data: Partial<RequestEntity>): Promise<void> {
+    try {
+      await this.requestRepository.update(id, data);
+    } catch (error) {
+      const isDuplicate = isDuplicateError(error.message);
+
+      if (isDuplicate) {
+        throw new BadRequestException(DUPLICATE_REQUEST);
+      }
+
+      throw Error(error);
+    }
   }
 
   async remove(id: string): Promise<string> {

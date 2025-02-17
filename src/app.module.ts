@@ -6,6 +6,7 @@ import configuration from './common/config/configuration';
 import { typeOrmAsyncConfig } from './common/config/type-orm-async-config';
 
 import { RequestsModule } from './requests/requests.module';
+import { RequestRunnerModule } from './request-runner/request-runner.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RequestsModule } from './requests/requests.module';
     }),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
     RequestsModule,
+    RequestRunnerModule,
   ],
   controllers: [],
   providers: [],
