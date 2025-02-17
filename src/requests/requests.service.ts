@@ -39,7 +39,7 @@ export class RequestsService {
   }
 
   async findAll(): Promise<RequestEntity[]> {
-    return this.requestRepository.find({ order: { createdAt: 'ASC' } });
+    return this.requestRepository.find({ order: { createdAt: 'DESC' } });
   }
 
   async findAllNewRequests(): Promise<RequestEntity[]> {

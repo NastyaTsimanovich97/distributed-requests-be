@@ -21,4 +21,7 @@ export default () =>
       },
       logging: false,
     },
+    fe: {
+      url: process.env.FE_APPLICATION_URL,
+    },
   }) as const;
